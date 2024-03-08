@@ -1,5 +1,6 @@
 #**Importing All the Required Libraries***
 import cv2
+from google.colab.patches import cv2_imshow
 import time
 import torch
 import argparse
@@ -14,8 +15,8 @@ import tensorflow
 from PIL import ImageFont, ImageDraw, Image
 
 #Creating an Empty Dictionary, to save the to shot count of each type of stroke
-# The first element in the dictionary is the  key, which contains the shot type 
-# The second element in the dictionary is the value, which contains the shot count of each of the stroke 
+# The first element in the dictionary is the  key, which contains the shot type
+# The second element in the dictionary is the value, which contains the shot count of each of the stroke
 # for example ForeHandGroundStroke is played by the player 10 times
 # while the Backhand Ground Stroke is played by the player 4 times.
 
@@ -41,7 +42,7 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
     ext = path.split('/')[-1].split('.')[-1].strip().lower()
     if ext in ["mp4", "webm", "avi"] or ext not in ["mp4", "webm", "avi"] and ext.isnumeric():
         input_path = int(path) if path.isnumeric() else path
-        device = select_device(opt.device)
+        device = select_device(device)
         names = load_classes(names)
         half = device.type != 'cpu'
         model = attempt_load(poseweights, map_location=device)
@@ -98,7 +99,7 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
                 #First, we will do for the Player 2
                 origimage = frame
                 #Creating a Black Mask
-                mask=np.zeros(frame.shape[:2] , dtype="uint8") 
+                mask=np.zeros(frame.shape[:2] , dtype="uint8")
                 #Setting the ROI for the Player 2
                 roi = cv2.rectangle(mask, (16, 415), (1274, 714),(255,255,255), -1)
                 #Overlapping the Mask on the Original Image
@@ -125,10 +126,10 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
                 start_time = time.time()
 
 
-                ###Player1 Starts From Here 
+                ###Player1 Starts From Here
                 origimage2 = frame
                 #Creating a Black Mask
-                mask2=np.zeros(frame.shape[:2] , dtype="uint8") 
+                mask2=np.zeros(frame.shape[:2] , dtype="uint8")
                 #Setting the Region of Interest for the Player 1
                 roi = cv2.rectangle(mask2, (348, 133), (1033, 356),(255,255,255), -1)
                 #Overlapping the Mask on the Original Image
@@ -185,24 +186,24 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
                 for idx in range(output2.shape[0]):
                     plot_skeleton_kpts(img_img2, output2[idx, 7:].T, 3)
 
-                gn = torch.tensor(img.shape)[[1, 0, 1, 0]]  # normalization gain whwh   
+                gn = torch.tensor(img.shape)[[1, 0, 1, 0]]  # normalization gain whwh
                 for i, pose in enumerate(output_data):  # detections per image
-                
+
                     if len(output_data):  #check if no pose
                         for c in pose[:, 5].unique(): # Print results
                             n = (pose[:, 5] == c).sum()  # detections per class
                             print("No of Objects in Current Frame : {}".format(n))
-                        
+
                         for det_index, (*xyxy, conf, cls) in enumerate(reversed(pose[:,:6])): #loop over poses for drawing on frame
                             c = int(cls)  # integer class
                             kpts = pose[det_index, 6:]
                             label = names[c]
                             #This function will create a bounding box and assign a label to the player 2
-                            plot_one_box_kpt(xyxy, img_img2, label=label, color=colors(c, True), 
-                                        line_thickness=opt.line_thickness, kpts=kpts, steps=3, 
-                                        orig_shape=img.shape[:2])                            
+                            plot_one_box_kpt(xyxy, img_img2, label=label, color=colors(c, True),
+                                        line_thickness=line_thickness, kpts=kpts, steps=3,
+                                        orig_shape=img.shape[:2])
                             # == 6.0 === preprocess model input data and pose prediction =======
-                            #1.So now, each video frame was fed into the YOLOv7 Pose Estimation Model 
+                            #1.So now, each video frame was fed into the YOLOv7 Pose Estimation Model
                             #and predicted Key points Landmarks (X-coordinate, Y-coordinate and confidence) were extracted
                             # 2. and stacked together as a sequence of 30 frames.
                             #Here we will plot the skeleton keypoints on the Player 2
@@ -219,7 +220,7 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
                                 # Doing the Shot Prediction over here
                                 result = tf_model.predict(np.expand_dims(sequence, axis=0))
                                 pose_name = actions[np.argmax(result)]
-                                #So we will save all the sequence values which we have got 
+                                #So we will save all the sequence values which we have got
                                 keypoints.append(sequence)
                                 #We are also saving all the Shot Names in a list as well
                                 posename_list.append(pose_name)
@@ -227,18 +228,18 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
                                 print(keypoints)
                                 print(pose_name)
                                 print(posename_list)
-                                # So here we are saying if the shot name is not in the object counter dictionary 
-                                #then add the name 
+                                # So here we are saying if the shot name is not in the object counter dictionary
+                                #then add the name
                                 #If the shot name is already there in the object counter dictionary then just
                                 #increment the counter
                                 if pose_name not in object_counter:
                                   object_counter[pose_name] = 1
                                 else:
                                   object_counter[pose_name] += 1
-                            #And when the value of j becomes equal to the value of the sequence 
+                            #And when the value of j becomes equal to the value of the sequence
                             #which we have the defined as 30, then remove all the previous values of sequence
                             #and set it as an empty list and start processing on the next frames
-                            
+
                             if j == seq:
                                 sequence = []
                                 j = 0
@@ -247,7 +248,7 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
                 xstart = (fw//2)
                 ystart = (fh-100)
                 yend = (fh-50)
-                # So After we have the shot name and the total shot count of each shot, we want to diplay them 
+                # So After we have the shot name and the total shot count of each shot, we want to diplay them
                 # in the output video so here we are just setting the UI where we want to display the Shot names and
                 #the total shot count in the Output Video
                 # = 7.0 == Draw prediction ==================================
@@ -272,17 +273,17 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
                     cv2.line(img_img2, ((width-500), 85 + (idx*40)), (width, 85 + (idx*40)), [85, 45, 255], 30)
                     cv2.putText(img_img2, cnt_str, ((width-500), 95 + (idx*40)), 0, 1, [255, 255, 255], thickness = 2, lineType = cv2.LINE_AA)
                 # display image
-                if webcam:
-                    cv2.imshow("Detection", img)
-                    key = cv2.waitKey(1)
-                    if key == ord('c'):
-                        break
-                else:
-                    img_ = img.copy()
-                    img_ = cv2.resize(
-                        img_, (960, 540), interpolation=cv2.INTER_LINEAR)
-                    cv2.imshow("Detection", img_img2)
-                    cv2.waitKey(1)
+                # if webcam:
+                #     cv2.imshow("Detection", img)
+                #     key = cv2.waitKey(1)
+                #     if key == ord('c'):
+                #         break
+                # else:
+                #     img_ = img.copy()
+                #     img_ = cv2.resize(
+                #         img_, (960, 540), interpolation=cv2.INTER_LINEAR)
+                #     cv2.imshow("Detection", img_img2)
+                #     cv2.waitKey(1)
 
                 end_time = time.time()
                 fps = 1 / (end_time - start_time)
@@ -297,25 +298,25 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
         print(f"Average FPS: {avg_fps:.3f}")
 
 
-def parse_opt():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--poseweights', nargs='+', type=str,
-                        default='yolov7-w6-pose.pt', help='model path(s)')
-    parser.add_argument('--source', type=str,
-                        help='path to video or 0 for webcam')
-    parser.add_argument('--device', type=str, default='cpu',
-                        help='cpu/0,1,2,3(gpu)')
-    parser.add_argument('--line_thickness', default = 3, help = 'Please Input the Value of Line Thickness')
+# def parse_opt():
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--poseweights', nargs='+', type=str,
+#                         default='yolov7-w6-pose.pt', help='model path(s)')
+#     parser.add_argument('--source', type=str,
+#                         help='path to video or 0 for webcam')
+#     parser.add_argument('--device', type=str, default='cpu',
+#                         help='cpu/0,1,2,3(gpu)')
+#     parser.add_argument('--line_thickness', default = 3, help = 'Please Input the Value of Line Thickness')
 
-    opt = parser.parse_args()
-    return opt
-
-
-def main(opt):
-    run(**vars(opt))
+#     opt = parser.parse_args()
+#     return opt
 
 
-if __name__ == "__main__":
-    opt = parse_opt()
-    strip_optimizer(opt.device, opt.poseweights)
-    main(opt)
+# def main(opt):
+#     run(**vars(opt))
+
+
+# if __name__ == "__main__":
+#     opt = parse_opt()
+#     strip_optimizer(opt.device, opt.poseweights)
+#     main(opt)
