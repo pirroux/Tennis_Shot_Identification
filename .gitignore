@@ -1,6 +1,7 @@
 yolov7-w6-pose.pt
 *.ttf
 .python-version
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
