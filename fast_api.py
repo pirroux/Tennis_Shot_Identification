@@ -34,7 +34,7 @@ async def convert_video_to_bw_frame(file: UploadFile = File(...)):
         buffer.write(contents)
 
     #launchin main python file from api
-    #subprocess.check_call(['python', '../tennis_shot_identification_and_counts.py', f'--source="{video_name}.mp4"', '--device="cpu"'])
+    subprocess.check_call(['python', 'tennis_shot_identification_and_counts.py', f'--source="{video_name}.mp4"', '--device="cpu"'])
 
     #with tempfile.NamedTemporaryFile(delete=True) as temp_file:
     with open(video_name, "rb") as temp_file:
