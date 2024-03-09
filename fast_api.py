@@ -27,9 +27,9 @@ async def convert_video_to_bw_frame(file: UploadFile = File(...)):
 
     #save the file in video input directory
     video_name = f"{uuid.uuid4()}.mp4"
-    save_directory = "/apivideos/"
-    video_path = os.path.join(save_directory, video_name)
-    with open(video_path, "wb") as buffer:
+    #save_directory = "/apivideos/"
+    #video_path = os.path.join(save_directory, video_name)
+    with open(video_name, "wb") as buffer:
         contents = await file.read()
         buffer.write(contents)
 
