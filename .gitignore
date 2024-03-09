@@ -1,5 +1,5 @@
 yolov7-w6-pose.pt
-*.ttf
+*.h5
 .python-version
 .DS_Store
 

@@ -1,6 +1,6 @@
 #**Importing All the Required Libraries***
 import cv2
-from google.colab.patches import cv2_imshow
+#from google.colab.patches import cv2_imshow
 import time
 import torch
 import argparse
@@ -37,7 +37,6 @@ def load_classes(path):
 
 @torch.no_grad()
 def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names = 'utils/coco.names', line_thickness = 2):
-
     path = source
     ext = path.split('/')[-1].split('.')[-1].strip().lower()
     if ext in ["mp4", "webm", "avi"] or ext not in ["mp4", "webm", "avi"] and ext.isnumeric():
@@ -80,7 +79,6 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
         # ==4.0=== Load trained pose-indentification model======
         tf_model = tensorflow.keras.models.load_model('mmodelfinal.h5')
         # ==================================================
-
         # == 5.0 == variable declaration===========
         sequence = []
         keypoints = []
@@ -298,25 +296,25 @@ def run(poseweights='yolov7-w6-pose.pt', source='pose.mp4', device='cpu', names 
         print(f"Average FPS: {avg_fps:.3f}")
 
 
-# def parse_opt():
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--poseweights', nargs='+', type=str,
-#                         default='yolov7-w6-pose.pt', help='model path(s)')
-#     parser.add_argument('--source', type=str,
-#                         help='path to video or 0 for webcam')
-#     parser.add_argument('--device', type=str, default='cpu',
-#                         help='cpu/0,1,2,3(gpu)')
-#     parser.add_argument('--line_thickness', default = 3, help = 'Please Input the Value of Line Thickness')
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--poseweights', nargs='+', type=str,
+                        default='yolov7-w6-pose.pt', help='model path(s)')
+    parser.add_argument('--source', type=str,
+                        help='path to video or 0 for webcam')
+    parser.add_argument('--device', type=str, default='cpu',
+                        help='cpu/0,1,2,3(gpu)')
+    parser.add_argument('--line_thickness', default = 3, help = 'Please Input the Value of Line Thickness')
 
-#     opt = parser.parse_args()
-#     return opt
-
-
-# def main(opt):
-#     run(**vars(opt))
+    opt = parser.parse_args()
+    return opt
 
 
-# if __name__ == "__main__":
-#     opt = parse_opt()
-#     strip_optimizer(opt.device, opt.poseweights)
-#     main(opt)
+def main(opt):
+    run(**vars(opt))
+
+
+if __name__ == "__main__":
+    opt = parse_opt()
+    strip_optimizer(opt.device, opt.poseweights)
+    main(opt)
