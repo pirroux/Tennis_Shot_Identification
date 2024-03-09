@@ -1,0 +1,11 @@
+opencv-python
+torch
+numpy
+torchvision
+tensorflow
+Pillow
+matplotlib
+pandas
+seaborn
+pyyaml
+argparse
